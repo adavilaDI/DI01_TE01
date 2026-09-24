@@ -29,7 +29,7 @@ export class HomePage {
   // Habrá que usar un computed para controlar si restaurantesCargados tiene elementos o no.
   hayDatos = computed(() => this.restaurantesCargados().length > 0);
 
-
+  //Computed añadido par indicar en un ion note que se modifiquen los filtros si el contador muestra 0 resultados y hay filtros activos
   hayFiltrosActivos = computed(() => {
     if(this.textoBusqueda() || this.territorioSeleccionado() || this.localidadesSeleccionadas()){
       return true;
@@ -181,6 +181,7 @@ export class HomePage {
     this.territorioSeleccionado.set("");
     this.localidadesSeleccionadas.set([]);
   }
+  //Resetea el ion select de territorios seleccionados asignandoselo a un boton
   borrarTerritorio(){
     this.territorioSeleccionado.set("");
   }
