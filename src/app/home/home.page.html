@@ -73,6 +73,7 @@
             <ion-select-option>{{t}}</ion-select-option>
             }
           </ion-select>
+          <ion-button fill="outline" size="small" (click)="borrarTerritorio()" title="Borrar">X</ion-button>
         </ion-item>
       </ion-col>
 
@@ -98,6 +99,7 @@
             labelPlacement="start"
             placeholder="Todas"
             [multiple]="true"
+            [title]="localidadesSeleccionadas().length > 0 ? localidadesSeleccionadas().join(', ') : 'todas'"
             cancelText="Cancelar"
             okText="Aceptar"
             [value]="localidadesSeleccionadas()"
@@ -124,6 +126,9 @@
   <ion-item>
     @if(hayDatos() && restaurantesFiltrados()){
     <ion-label>
+      @if(restaurantesFiltrados().length === 0 && hayFiltrosActivos()){
+        <ion-note>Prueba a cambiar los filtros</ion-note><br/>
+      }
       Mostrando {{restaurantesFiltrados().length}} de
       {{restaurantesCargados().length}} restaurantes
     </ion-label>
@@ -168,10 +173,8 @@
               >{{r.web}}</a
             >}
           </td>
-          <!--<td>{{ r.michelinStar !=="" ? r.michelinStar : '-' }}</td>
-              <td>{{ r.repsolSun !=="" ? r.repsolSun : '-' }}</td> -->
-          <td>{{ estrellasMichelin(r) }}</td>
-          <td>{{ repsolSoles(r)}}</td>
+          <td>{{ r.michelinStar !=="" ? r.michelinStar : '-' }}</td>
+          <td>{{ r.repsolSun !=="" ? r.repsolSun : '-' }}</td> 
         </tr>
         }
       </tbody>

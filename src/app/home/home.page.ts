@@ -28,6 +28,14 @@ export class HomePage {
   // TODO - true cuando hay al menos un restaurante cargado.
   // Habrá que usar un computed para controlar si restaurantesCargados tiene elementos o no.
   hayDatos = computed(() => this.restaurantesCargados().length > 0);
+
+
+  hayFiltrosActivos = computed(() => {
+    if(this.textoBusqueda() || this.territorioSeleccionado() || this.localidadesSeleccionadas()){
+      return true;
+    }
+    return false;
+  });
   
   // TODO - Carga la lista completa en el signal y muestra un toast de confirmación
   cargarDatos() {
@@ -172,5 +180,8 @@ export class HomePage {
     this.textoBusqueda.set('');
     this.territorioSeleccionado.set("");
     this.localidadesSeleccionadas.set([]);
+  }
+  borrarTerritorio(){
+    this.territorioSeleccionado.set("");
   }
 }
