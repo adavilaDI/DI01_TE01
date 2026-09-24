@@ -3,21 +3,31 @@
     <ion-title>Guía de Restaurantes Euskadi</ion-title>
     <ion-buttons slot="end">
       <!-- Botón que llama al método cargarDatos() del componente -->
-      
+      <ion-button
+        (click)="cargarDatos()"
+        shape="round"
+        fill="solid"
+        color="primary"
+        >Cargar Datos</ion-button
+      >
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-
   <!-- TODO - Mostrar un mensaje informativo cuando no hay datos cargados (hayDatos() devuelve false)
        PISTA: Usa @if para comprobar la condición y dentro coloca un ion-item con un ion-label
               explicando al usuario que pulse "Cargar datos" para empezar -->
-
+  @if(!hayDatos()){
+  <ion-item color="light">
+    <ion-label
+      >Pulsa en el boton CARGAR DATOS para ver la lista completa</ion-label
+    >
+  </ion-item>
+  }
   <!-- Filtros -->
   <ion-grid>
     <ion-row class="ion-align-items-center ion-justify-content-start">
-
       <!-- Filtro de búsqueda por nombre -->
       <ion-col size="12" size-md="3">
         <ion-item>
@@ -27,6 +37,14 @@
                · [disabled] enlazado a !hayDatos() para desactivarlo si no hay datos
                · (ionInput) que actualice el signal textoBusqueda usando .set() con el valor del evento ($event.detail.value)
                  PISTA: usa ?? '' para evitar valores null o undefined -->
+          <ion-input
+            label="Buscar"
+            placeholder="Buscar por nombre"
+            [value]="textoBusqueda()"
+            (ionInput)="textoBusqueda.set($event.detail.value ?? '')"
+            [disabled]="!hayDatos()"
+          >
+          </ion-input>
         </ion-item>
       </ion-col>
 
@@ -42,6 +60,19 @@
                · (ionChange) que llame a onTerritorioChange() pasándole $event.detail.value
                Dentro del ion-select, recorre con @for la lista territoriosFiltrados() y genera
                un ion-select-option por cada territorio (usa track t) -->
+          <ion-select
+            label="Territorio"
+            labelPlacement="start"
+            placeholder="Todos"
+            interface="popover"
+            [disabled]="!hayDatos()"
+            (ionChange)="onTerritorioChange($event.detail.value)"
+            [value]="territorioSeleccionado()"
+          >
+            @for(t of territoriosFiltrados(); track t){
+            <ion-select-option>{{t}}</ion-select-option>
+            }
+          </ion-select>
         </ion-item>
       </ion-col>
 
@@ -62,6 +93,21 @@
                · (ionChange) que llame a onLocalidadesChange() pasándole $event.detail.value
                Dentro del ion-select, recorre con @for la lista localidadesFiltradasPorTerritorio()
                y genera un ion-select-option por cada localidad (usa track loc) -->
+          <ion-select
+            label="Localidades"
+            labelPlacement="start"
+            placeholder="Todas"
+            [multiple]="true"
+            cancelText="Cancelar"
+            okText="Aceptar"
+            [value]="localidadesSeleccionadas()"
+            [disabled]="!hayDatos()"
+            (ionChange)="onLocalidadesChange($event.detail.value)"
+          >
+            @for(l of localidadesFiltradasPorTerritorio(); track l){
+            <ion-select-option>{{l}}</ion-select-option>
+            }
+          </ion-select>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -76,12 +122,14 @@
               cuando no hay resultados (length === 0) Y además hay filtros activos (hayFiltrosActivos()) -->
 
   <ion-item>
+    @if(hayDatos() && restaurantesFiltrados()){
     <ion-label>
-
+      Mostrando {{restaurantesFiltrados().length}} de
+      {{restaurantesCargados().length}} restaurantes
     </ion-label>
-  </ion-item>  
+    }
+  </ion-item>
 
-              
   <!-- TODO - Mostrar la tabla de restaurantes cuando restaurantesFiltrados().length > 0
        La tabla debe tener las columnas: Nombre, Localidad, Dirección, Teléfono, Territorio, Web, Estrellas Michelin, Soles Repsol
        Usa @for para recorrer restaurantesFiltrados() y generar una fila <tr> por restaurante (track r.documentName)
@@ -104,18 +152,39 @@
           <th>Soles Repsol</th>
         </tr>
       </thead>
-      <tbody>
 
+      @if(restaurantesFiltrados().length > 0){
+      <tbody>
+        @for(r of restaurantesFiltrados(); track r.documentName){
+
+        <tr>
+          <td>{{r.documentName}}</td>
+          <td>{{r.locality}}</td>
+          <td>{{r.address}}</td>
+          <td>{{r.phone}}</td>
+          <td>{{r.territory}}</td>
+          <td>
+            @if (r.web){<a [href]="r.web" target="_blank" [title]="r.web"
+              >{{r.web}}</a
+            >}
+          </td>
+          <!--<td>{{ r.michelinStar !=="" ? r.michelinStar : '-' }}</td>
+              <td>{{ r.repsolSun !=="" ? r.repsolSun : '-' }}</td> -->
+          <td>{{ estrellasMichelin(r) }}</td>
+          <td>{{ repsolSoles(r)}}</td>
+        </tr>
+        }
       </tbody>
+      } @else { @if(hayDatos()){
+      <ion-item>
+        <ion-label color="warning">Ningún restaurante coincide con los filtros</ion-label>
+      </ion-item>
+      <ion-button (click)="resetearBusqueda()">limpiar filtros</ion-button>
+      } }
     </table>
   </div>
   <!-- TODO - Añadir un bloque @else al @if anterior (cuando no hay resultados filtrados)
        Dentro, usa otro @if (hayDatos()) para mostrar un mensaje de aviso (color="warning")
        indicando que ningún restaurante coincide con los filtros.
        Incluye un elemento clicable que llame a limpiarTodosFiltros() para resetear los filtros -->
-  <ion-item>
-    <ion-label>
-      
-    </ion-label>
-  </ion-item>
 </ion-content>
